@@ -9,6 +9,7 @@ from torch_tensorrt.dynamo.conversion import impl
 from torch_tensorrt.dynamo.conversion.converter_utils import (
     cast_int_int_div_trt_tensor,
     cast_trt_tensor,
+    dynamic_unsupported,
 )
 from torch_tensorrt.fx.converters import acc_ops_converters
 from torch_tensorrt.fx.types import TRTNetwork, TRTTensor
@@ -390,6 +391,22 @@ def aten_ops_softmax(
     return impl.normalization.softmax(
         network, target, SourceIR.ATEN, name, args[0], args[1]
     )
+
+
+@dynamo_tensorrt_converter(
+    torch.ops.aten.split.default, capability_validator=dynamic_unsupported
+)
+@dynamo_tensorrt_converter(
+    torch.ops.aten.split.sizes, capability_validator=dynamic_unsupported
+)
+def aten_ops_split(
+    network: TRTNetwork,
+    target: Target,
+    args: Tuple[Argument, ...],
+    kwargs: Dict[str, Argument],
+    name: str,
+) -> Union[TRTTensor, Sequence[TRTTensor]]:
+    return impl.split(network, target, SourceIR.ATEN, name, args[0], args[1], args[2])
 
 
 @dynamo_tensorrt_converter(torch.ops.aten.where.self)  # type: ignore[misc]
