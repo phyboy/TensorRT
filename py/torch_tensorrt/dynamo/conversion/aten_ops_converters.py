@@ -9,7 +9,7 @@ from torch_tensorrt.dynamo.conversion import impl
 from torch_tensorrt.dynamo.conversion.converter_utils import (
     cast_int_int_div_trt_tensor,
     cast_trt_tensor,
-    dynamic_unsupported,
+    dynamic_unsupported_with_args,
 )
 from torch_tensorrt.fx.converters import acc_ops_converters
 from torch_tensorrt.fx.types import TRTNetwork, TRTTensor
@@ -391,28 +391,17 @@ def aten_ops_softmax(
     return impl.normalization.softmax(
         network, target, SourceIR.ATEN, name, args[0], args[1]
     )
-    
-def dynamic_unsupported_split(node: torch.fx.Node) -> bool:
-    # Validate that none of the inputs to the node have Dynamic shapes
-    assert isinstance(
-        node, torch.fx.Node
-    ), "Inputs to validator functions must be FX Nodes"
-
-    if isinstance(node.args[1], torch.fx.Node):
-        if getattr(node.args[1].meta["val"], "_has_symbolic_sizes_strides", True):
-            return False
-    return True
 
 
 @dynamo_tensorrt_converter(
-    torch.ops.aten.split.Tensor, capability_validator=dynamic_unsupported_split
+    torch.ops.aten.split.Tensor, capability_validator=dynamic_unsupported_with_args([1])
 )
 @dynamo_tensorrt_converter(
-    torch.ops.aten.split.sizes, capability_validator=dynamic_unsupported_split
+    torch.ops.aten.split.sizes, capability_validator=dynamic_unsupported_with_args([1])
 )
 @dynamo_tensorrt_converter(
     torch.ops.aten.split_with_sizes.default,
-    capability_validator=dynamic_unsupported_split,
+    capability_validator=dynamic_unsupported_with_args([1]),
 )
 def aten_ops_split(
     network: TRTNetwork,
@@ -420,7 +409,7 @@ def aten_ops_split(
     args: Tuple[Argument, ...],
     kwargs: Dict[str, Argument],
     name: str,
-) -> Union[TRTTensor, Sequence[TRTTensor]]: 
+) -> Union[TRTTensor, Sequence[TRTTensor]]:
     return impl.split.split(
         network,
         target,
