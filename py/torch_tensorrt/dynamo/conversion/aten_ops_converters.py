@@ -182,6 +182,17 @@ def aten_ops_matmul(
         network, target, SourceIR.ATEN, name, args[0], args[1]
     )
 
+@dynamo_tensorrt_converter(torch.ops.aten.bmm.default)
+def aten_ops_bmm(
+    network: TRTNetwork,
+    target: Target,
+    args: Tuple[Argument, ...],
+    kwargs: Dict[str, Argument],
+    name: str,
+) -> Union[TRTTensor, Sequence[TRTTensor]]:
+    return impl.matmul.bmm(
+        network, target, SourceIR.ATEN, name, args[0], args[1]
+    )
 
 @dynamo_tensorrt_converter(torch.ops.aten.layer_norm.default)
 def aten_ops_layernorm(
