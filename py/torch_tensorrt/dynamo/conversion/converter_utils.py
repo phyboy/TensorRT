@@ -1,7 +1,7 @@
 import functools
 import logging
 import re
-from typing import Any, List, Optional, Tuple, Callable
+from typing import Any, Callable, List, Optional, Tuple
 
 import tensorrt as trt
 import torch
@@ -53,7 +53,9 @@ def dynamic_unsupported_with_args(
     arg_positions_to_check: Optional[List[int]] = None,
 ) -> Callable[[torch.fx.Node], bool]:
     """Returns a validator that a node has no dynamic args at specific positions"""
-    return functools.partial(_dynamic_unsupported, arg_positions_to_check=arg_positions_to_check)
+    return functools.partial(
+        _dynamic_unsupported, arg_positions_to_check=arg_positions_to_check
+    )
 
 
 def _dynamic_unsupported(
