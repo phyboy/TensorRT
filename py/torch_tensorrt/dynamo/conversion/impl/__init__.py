@@ -7,6 +7,7 @@ from . import (
     conv,
     elementwise,
     embedding,
+    grid,
     matmul,
     normalization,
     permutation,
