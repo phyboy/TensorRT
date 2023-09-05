@@ -24,7 +24,7 @@ def args_bounds_check(
     return args[i] if len(args) > i else replacement
 
 
-@dynamo_tensorrt_converter(torch.ops.aten.batch_norm)  # type: ignore[misc]
+@dynamo_tensorrt_converter(torch.ops.aten.batch_norm.default)  # type: ignore[misc]
 def aten_ops_batch_norm(
     network: TRTNetwork,
     target: Target,
@@ -296,7 +296,7 @@ def aten_ops_hard_sigmoid(
     )
 
 
-@dynamo_tensorrt_converter(torch.ops.aten.matmul)  # type: ignore[misc]
+@dynamo_tensorrt_converter(torch.ops.aten.matmul.default)  # type: ignore[misc]
 @dynamo_tensorrt_converter(torch.ops.aten.mm.default)  # type: ignore[misc]
 @dynamo_tensorrt_converter(torch.ops.aten.mv.default)  # type: ignore[misc]
 def aten_ops_matmul(
