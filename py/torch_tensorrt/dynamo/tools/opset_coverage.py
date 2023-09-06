@@ -129,7 +129,11 @@ def opset_coverage(
     support_count = 0
     legacy_count = 0
     for target in c_registry.keys():
-        target_str = c_registry.qualified_name_or_str(target).removeprefix("torch.ops.")
+        target_str = (
+            c_registry.qualified_name_or_str(target)
+            .removeprefix("torch.ops.")
+            .replace(".default", "")
+        )
         if target_str in opset_targets:
             _, registry_data = c_registry.get_all_converters_with_target(
                 target, return_registry_info=True
@@ -155,7 +159,9 @@ def opset_coverage(
         else get_decompositions()
     )
     decomp_registry_targets = {
-        c_registry.qualified_name_or_str(target).removeprefix("torch.ops.")
+        c_registry.qualified_name_or_str(target)
+        .removeprefix("torch.ops.")
+        .replace(".default", "")
         for target in l_registry.keys()
     }
     supported_decomp_targets = opset_targets.intersection(decomp_registry_targets)
